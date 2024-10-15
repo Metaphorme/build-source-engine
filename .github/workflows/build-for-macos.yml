@@ -90,5 +90,5 @@ jobs:
           name: source-engine-${{ matrix.config.platform }}-${{ matrix.config.arch }}
           path: |
             build/*.tar.xz
-            sha256sum
-            version.txt
+            build/sha256sum
+            build/version.txt

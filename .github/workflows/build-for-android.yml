@@ -13,11 +13,11 @@ jobs:
                     os: ubuntu-20.04,
                     arch: ARMv7A,
                 }
-                - {
-                    platform: Android,
-                    os: ubuntu-latest,
-                    arch: ARMv8,
-                }
+                # - {
+                #     platform: Android,
+                #     os: ubuntu-latest,
+                #     arch: ARMv8,
+                # }
 
     runs-on: ${{ matrix.config.os }}
     continue-on-error: true

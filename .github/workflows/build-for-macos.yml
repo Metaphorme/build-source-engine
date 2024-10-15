@@ -1,4 +1,4 @@
-name: Build Source Engine
+name: Build Source Engine for macOS
 
 on:
   workflow_dispatch:
@@ -9,12 +9,12 @@ jobs:
         matrix:
             config:
                 - {
-                    name: macOS-x86_64,
+                    platform: macOS,
                     os: macos-13,
                     arch: x86_64,
                 }
                 - {
-                    name: macOS-AArch64,
+                    platform: macOS,
                     os: macos-latest,
                     arch: AArch64
                 }
@@ -50,7 +50,7 @@ jobs:
           
           # 编译引擎
           for build_game in ${games[*]}; do
-              echo "Building and installing $build_game for macOS on ${{ matrix.config.arch }}..."
+              echo "Building and installing $build_game for ${{ matrix.config.platform }} on ${{ matrix.config.arch }}..."
           
               python3 waf configure -T release --prefix='' --build-games="$build_game"
               if [ $? -ne 0 ]; then
@@ -64,7 +64,7 @@ jobs:
                   exit 1
               fi
           
-              python3 waf install --destdir="../build/source-engine-${build_game}-macOS-${{ matrix.config.arch }}"
+              python3 waf install --destdir="../build/source-engine-${build_game}-${{ matrix.config.platform }}-${{ matrix.config.arch }}"
               if [ $? -ne 0 ]; then
                   echo "Install failed for $build_game"
                   exit 1
@@ -77,15 +77,18 @@ jobs:
         run: |
           cd build
           for build_game in ${games[*]}; do
-            tar -cJf source-engine-${build_game}-macOS-${{ matrix.config.arch }}.tar.xz source-engine-${build_game}-macOS-${{ matrix.config.arch }}/*
+            tar -cJf source-engine-${build_game}-${{ matrix.config.platform }}-${{ matrix.config.arch }}.tar.xz source-engine-${build_game}-${{ matrix.config.platform }}-${{ matrix.config.arch }}/*
           done
 
           shasum -a 256 *.tar.xz > sha256sum
 
-          echo "Commit Hash: $(git log --pretty=format:'%H' -n 1)\nBuild Time: $(echo `date -u`)\nBuild by: https://github.com/Metaphorme/build-source-engine" > version.txt
+          echo -e "Commit Hash: $(git log --pretty=format:'%H' -n 1)\nBuild Time: $(echo `date -u`)\nBuild by: https://github.com/Metaphorme/build-source-engine" > version.txt
       
-      - name: Upload artifacts
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: source-engine-macOS-${{ matrix.config.arch }}
-          path: build/*
+          name: source-engine-${{ matrix.config.platform }}-${{ matrix.config.arch }}
+          path: |
+            build/*.tar.xz
+            sha256sum
+            version.txt

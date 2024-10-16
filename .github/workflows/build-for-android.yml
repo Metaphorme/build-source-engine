@@ -13,11 +13,11 @@ jobs:
                     os: ubuntu-20.04,
                     arch: ARMv7A,
                 }
-                - {
-                    platform: Android,
-                    os: ubuntu-20.04,
-                    arch: ARMv8,
-                }
+                # - {
+                #     platform: Android,
+                #     os: ubuntu-20.04,
+                #     arch: ARMv8,
+                # }
 
     runs-on: ${{ matrix.config.os }}
     continue-on-error: true
@@ -64,7 +64,7 @@ jobs:
               if [ "${{ matrix.config.arch }}" == "ARMv7A" ]; then
                   python3 waf configure -T release --prefix='' --build-games="$build_game" --android=armeabi-v7a-hard,4.9,21 --togles
               elif [ "${{ matrix.config.arch }}" == "ARMv8" ]; then
-                  python3 waf configure -T release --prefix='' -8 --build-games="$build_game" --android=aarch64,4.9,21 --togles
+                  python3 waf configure -T release --prefix='' --build-games="$build_game" --android=aarch64,4.9,21 --togles
               fi
           
               python3 waf build

@@ -1,0 +1,83 @@
+name: Test Source Engine for macOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Build:
+    strategy:
+        matrix:
+            config:
+                - {
+                    platform: macOS,
+                    os: macos-13,
+                    arch: x86_64,
+                }
+                - {
+                    platform: macOS,
+                    os: macos-latest,
+                    arch: AArch64
+                }
+
+    runs-on: ${{ matrix.config.os }}
+    
+    # 需要编译的引擎类型
+    # 参考：https://gist.github.com/tifasoftware/971697061ffcf783807887795d7406df
+    # hl2       ->  半条命2
+    # episodic  ->  半条命2：第一章、半条命2：第二章（我没有测试）
+    # hl1       ->  可能是半条命：起源（我没有测试）
+    # portal    ->  传送门（我没有测试）
+    env:
+      games: "hl2 episodic hl1 portal"
+  
+    steps: 
+      - name: Clone Source Code
+        run: |
+          git clone --recursive --depth 1 https://github.com/nillerusr/source-engine.git
+
+      - name: Install Dependencies
+        run: |
+          brew install sdl2 freetype2 fontconfig pkg-config opus libpng libedit
+
+      - name: Make Configure and Build
+        run: |
+          export LDFLAGS="-L/opt/homebrew/opt/libedit/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/libedit/include"
+          export PKG_CONFIG_PATH="/opt/homebrew/opt/libedit/lib/pkgconfig"
+
+          mkdir build
+          cd source-engine
+          
+          # Build the Engine
+          for build_game in ${games[*]}; do
+              echo "Building and installing $build_game for ${{ matrix.config.platform }} on ${{ matrix.config.arch }}..."
+          
+              python3 waf configure -T release --sanitize=address,undefined --prefix='' --build-games="$build_game" --disable-warns --tests
+              if [ $? -ne 0 ]; then
+                  echo "Configuration failed for $build_game"
+                  exit 1
+              fi
+          
+              python3 waf build
+              if [ $? -ne 0 ]; then
+                  echo "Build failed for $build_game"
+                  exit 1
+              fi
+          
+              python3 waf install --destdir="../build/source-engine-${build_game}-${{ matrix.config.platform }}-${{ matrix.config.arch }}"
+              if [ $? -ne 0 ]; then
+                  echo "Install failed for $build_game"
+                  exit 1
+              fi
+          
+              echo "$build_game build and install completed successfully."
+          done
+
+      - name: Test
+        run: |
+          cd build
+          for build_game in ${games[*]}; do
+            cd source-engine-${build_game}-${{ matrix.config.platform }}-${{ matrix.config.arch }}
+            DYLD_LIBRARY_PATH=bin/ ./unittest
+            cd ..
+          done

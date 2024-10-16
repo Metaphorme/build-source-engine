@@ -121,3 +121,38 @@ Build source engine from [nillerusr/source-engine](https://github.com/nillerusr/
   </tr>
   
 </table>
+
+## How to play (using Half-Life 2 as an example)
+
+[中文教程](https://diazepam.cc/post/play-halflife2-natively-on-apple-silicon/)
+
+### Download game files
+
+Buy and download [Half-Life 2 from Steam](https://store.steampowered.com/app/220/HalfLife_2/).
+
+### Add the engine files
+
+Download correct engine from [release page](https://github.com/Metaphorme/build-source-engine/releases), uncompress and add **files** into corresponding game files' directory.
+
+### Launch
+
+Run:
+
+```bash
+DYLD_LIBRARY_PATH=bin/ ./hl2_launcher
+````
+
+## Known bugs
+
+1. If it can't display Chinese or other languages in the menu and subtitles, you can set the menu and subtitles to English while using the native audio.
+   
+   Just launch as follows:
+   
+   ```bash
+   # language       ->  Interface
+   # audiolanguage  ->  Audio
+   # cc_lang        ->  Subtitles
+   DYLD_LIBRARY_PATH=bin/ ./hl2_launcher -language english -audiolanguage schinese +cc_lang english
+   ```
+
+   For more information, please [check](https://steamcommunity.com/sharedfiles/filedetails/?id=3089088861).

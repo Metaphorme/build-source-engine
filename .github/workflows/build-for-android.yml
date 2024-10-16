@@ -13,6 +13,7 @@ jobs:
                     os: ubuntu-20.04,
                     arch: ARMv7A,
                 }
+                # Can't build. Ref:https://github.com/nillerusr/source-engine/issues/167
                 # - {
                 #     platform: Android,
                 #     os: ubuntu-20.04,
@@ -22,12 +23,12 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     continue-on-error: true
     
-    # 需要编译的引擎类型
-    # 参考：https://gist.github.com/tifasoftware/971697061ffcf783807887795d7406df
-    # hl2       ->  半条命2
-    # episodic  ->  半条命2：第一章、半条命2：第二章（我没有测试）
-    # hl1       ->  可能是半条命：起源（我没有测试）
-    # portal    ->  传送门（我没有测试）
+    # Engines for Game
+    # Reference：https://gist.github.com/tifasoftware/971697061ffcf783807887795d7406df
+    # hl2       ->  Half-Life 2
+    # episodic  ->  Half-Life 2 Episode One, Half-Life 2 Episode Two
+    # hl1       ->  Half Life: Source
+    # portal    ->  Portal
     env:
       games: "hl2 episodic hl1 portal"
   
@@ -57,14 +58,14 @@ jobs:
           mkdir build
           cd source-engine
           
-          # 编译引擎
+          # Build the engine
           for build_game in ${games[*]}; do
               echo "Building and installing $build_game for ${{ matrix.config.platform }} on ${{ matrix.config.arch }}..."
           
               if [ "${{ matrix.config.arch }}" == "ARMv7A" ]; then
-                  python3 waf configure -T release --prefix='' --build-games="$build_game" --android=armeabi-v7a-hard,4.9,21 --togles
+                  python3 waf configure -T release --prefix='' --build-games="$build_game" --android=armeabi-v7a-hard,4.9,21 --togles --disable-warns
               elif [ "${{ matrix.config.arch }}" == "ARMv8" ]; then
-                  python3 waf configure -T release --prefix='' --build-games="$build_game" --android=aarch64,4.9,21 --togles
+                  python3 waf configure -T release --prefix='' --build-games="$build_game" --android=aarch64,4.9,21 --togles --disable-warns
               fi
           
               python3 waf build

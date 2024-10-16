@@ -59,10 +59,10 @@ jobs:
               echo "Building and installing $build_game for ${{ matrix.config.platform }} on ${{ matrix.config.arch }}..."
           
               if [ "${{ matrix.config.arch }}" == "x86_64" ]; then
-                  python3 waf configure -T release --sanitize=address,undefined --prefix='' --build-games="$build_game" --disable-warn --tests
+                  python3 waf configure -T release --sanitize=address,undefined --prefix='' --build-games="$build_game" --disable-warns --tests
                   
               elif [ "${{ matrix.config.arch }}" == "i386" ]; then
-                  PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig python3 waf configure -T release --prefix='' --build-games="$build_game" --32bits
+                  PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig python3 waf configure -T release --sanitize=address,undefined --prefix='' --build-games="$build_game" --disable-warns --tests --32bits 
               fi
           
               python3 waf build

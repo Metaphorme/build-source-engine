@@ -13,11 +13,11 @@ jobs:
                     os: ubuntu-20.04,
                     arch: ARMv7A,
                 }
-                # - {
-                #     platform: Android,
-                #     os: ubuntu-latest,
-                #     arch: ARMv8,
-                # }
+                - {
+                    platform: Android,
+                    os: ubuntu-latest,
+                    arch: ARMv8,
+                }
 
     runs-on: ${{ matrix.config.os }}
     continue-on-error: true
@@ -38,18 +38,16 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          if [ "${{ matrix.config.arch }}" == "ARMv8" ]; then
-            sudo dpkg --add-architecture arm64
-            sudo apt-get update
-            sudo apt-get install -y aptitude
-            sudo aptitude install -y sudo aptitude install -y build-essential:arm64 libsdl2-dev:arm64
-          fi
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 11
           
           wget https://dl.google.com/android/repository/android-ndk-r10e-linux-x86_64.zip -o /dev/null
           unzip android-ndk-r10e-linux-x86_64.zip
 
       - name: Make Configure and Build
         run: |
+          export PATH="/usr/lib/llvm-11/bin:$PATH"
           export ANDROID_NDK_HOME=$PWD/android-ndk-r10e/
           export NDK_HOME=$PWD/android-ndk-r10e/
 
